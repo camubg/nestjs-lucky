@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Get, Header, Param } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { UsersRepository } from "src/repositories/users.repository";
+import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
+import { UserSignUpDTO } from "./dto/user-sign-up.dto";
 import { UsersService } from "./users.service";
 
 @Controller('users')
@@ -12,22 +12,16 @@ export class UsersController {
 
     @Post()
     addUser(
-        @Body('username') username: string, 
-        @Body('password') password: string, 
-        @Body('name') name: string, 
-        @Body('anddres') address: string, 
-        @Body('cityId') cityId: string
+        @Body() userSignUpDTO: UserSignUpDTO
         ) {
-        const generatedId = this.usersService.addUser(username, password, name, address, cityId);
+        const generatedId = this.usersService.addUser(userSignUpDTO);
         return { id: generatedId };
     }
 
     @Post('login')
     loginUser(
-        @Body('username') username: string, 
-        @Body('password') password: string, 
-        ) {
-        const generatedJwtToken = this.usersService.loginUser(username, password);
+        @Body() authCredentialsDTO: AuthCredentialsDTO) {
+        const generatedJwtToken = this.usersService.loginUser(authCredentialsDTO);
         return { jwtToken: generatedJwtToken };
     }
 

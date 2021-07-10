@@ -5,6 +5,7 @@ import { CitiesRepository } from 'src/repositories/cities.repository';
 import { CountriesRepository } from 'src/repositories/countries.repository';
 import { ProfilesRepository } from 'src/repositories/profiles.repository';
 import { UsersRepository } from 'src/repositories/users.repository';
+import { UsersValidator } from './users-validator.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
@@ -19,6 +20,7 @@ import { UsersService } from './users.service';
     ])
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService,
+    UsersValidator],
 })
 export class UsersModule {}
