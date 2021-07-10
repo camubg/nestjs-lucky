@@ -1,6 +1,4 @@
-import { Injectable } from "@nestjs/common";
 import { NotFoundException } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
 import { EntityRepository, Repository } from "typeorm";
 import { Country } from "./country.entity";
 
@@ -32,7 +30,9 @@ export class CountriesRepository extends Repository<Country> {
 
     async getCountryByName(name: string): Promise<Country> {
         
-        const found = await this.getCountryByName(name);
+        const found = await this.createQueryBuilder("country")
+        .select(['country.id', 'country.name']) 
+        .where("country.name = :name", { name: name }).getOne();
         
         if(!found){
             throw new NotFoundException(`Country with name "${name}" not found`);
