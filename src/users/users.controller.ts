@@ -1,10 +1,14 @@
 import { Controller, Post, Body, Get, Header, Param } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UsersRepository } from "src/repositories/users.repository";
 import { UsersService } from "./users.service";
 
 @Controller('users')
 export class UsersController {
 
-    constructor(private readonly usersService: UsersService) {}
+    constructor(
+        private readonly usersService: UsersService
+        ) {}
 
     @Post()
     addUser(
@@ -27,11 +31,9 @@ export class UsersController {
         return { jwtToken: generatedJwtToken };
     }
 
-    @Get(':id')
-    getUser(
-        @Param('id') userId: string
-        ) {
-        return this.usersService.getUser(userId, "token");
+    @Get('profile')
+    getUser() {
+        return this.usersService.getUser("token");
     }
 
 }
