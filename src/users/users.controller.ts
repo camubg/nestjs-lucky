@@ -1,6 +1,8 @@
-import { Controller, Post, Body, Get, Header, Param } from "@nestjs/common";
+import { Controller, Post, Body, Get, Header, Param, UseGuards } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
 import { UserSignUpDTO } from "./dto/user-sign-up.dto";
+import { Profile } from "./model/profile.model";
 import { UsersService } from "./users.service";
 
 @Controller('users')
@@ -13,21 +15,22 @@ export class UsersController {
     @Post()
     addUser(
         @Body() userSignUpDTO: UserSignUpDTO
-        ) {
-        const generatedId = this.usersService.addUser(userSignUpDTO);
-        return { id: generatedId };
+        ): Promise<void> {
+        
+            return this.usersService.addUser(userSignUpDTO);
     }
 
     @Post('login')
     loginUser(
-        @Body() authCredentialsDTO: AuthCredentialsDTO) {
+        @Body() authCredentialsDTO: AuthCredentialsDTO): Promise<{ accessToken: string }> {
         const generatedJwtToken = this.usersService.loginUser(authCredentialsDTO);
-        return { jwtToken: generatedJwtToken };
+        return generatedJwtToken;
     }
 
     @Get('profile')
-    getUser() {
-        return this.usersService.getUser("token");
+    @UseGuards(AuthGuard())
+    getUser(): Promise<{ profile: Profile }> {
+        return this.usersService.getUser();
     }
 
 }
