@@ -19,22 +19,34 @@ export class UsersValidator {
     }
 
     private authCredentialsDTOValidLength(authCredentialsDTO: AuthCredentialsDTO) {
-        var minLength = 4;
+        this.validateUsernameLength(authCredentialsDTO.username);
+        this.validatePasswordLength(authCredentialsDTO.password);
+    }
+
+    private validatePasswordLength(password: String) {
+        var minLength = 8;
         var maxLength = 20;
-        
-        if(authCredentialsDTO.username.length < minLength ){
-            throw new BadRequestException(`Username can't have less than "${minLength}" characters`);
-        } else if(authCredentialsDTO.username.length > 20){
-            throw new BadRequestException(`Username can't have more than "${maxLength}" characters`);
+        if (password.length < minLength) {
+            throw new BadRequestException(`Password can't have less than "${minLength}" characters`);
+        } else if (password.length > 20) {
+            throw new BadRequestException(`Password can't have more than "${maxLength}" characters`);
         }
     }
     
+    private validateUsernameLength(username: String) {
+        var minLength = 4;
+        var maxLength = 20;
+        if (username.length < minLength) {
+            throw new BadRequestException(`Username can't have less than "${minLength}" characters`);
+        } else if (username.length > 20) {
+            throw new BadRequestException(`Username can't have more than "${maxLength}" characters`);
+        }
+    }
+
     private authCredentialsDTOIsString(authCredentialsDTO: AuthCredentialsDTO) {
         
-        var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-        if(format.test(authCredentialsDTO.username)){
-            throw new BadRequestException("Username can't have special characters");
-        }
+        this.validatePasswordCharacters(authCredentialsDTO.password);
+        this.validateUsernameCharacters(authCredentialsDTO.password);
     }
 
     private authCredentialsDTONotNull(authCredentialsDTO: AuthCredentialsDTO) {
@@ -50,11 +62,8 @@ export class UsersValidator {
         var maxLength = 20;
         var uuidLength = 36;
         
-        if(userSignUpDTO.username.length < minLength ){
-            throw new BadRequestException(`Username can't have less than "${minLength}" characters`);
-        } else if(userSignUpDTO.username.length > 20){
-            throw new BadRequestException(`Username can't have more than "${maxLength}" characters`);
-        }
+        this.validateUsernameLength(userSignUpDTO.username);
+        this.validatePasswordLength(userSignUpDTO.password);
 
         if(userSignUpDTO.name.length > 20){
             throw new BadRequestException(`Name can't have more than "${maxLength}" characters`);
@@ -76,9 +85,9 @@ export class UsersValidator {
         var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
         var formatWithSpace = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
         
-        if(format.test(userSignUpDTO.username)){
-            throw new BadRequestException("Username can't have special characters");
-        }
+        this.validatePasswordCharacters(userSignUpDTO.password);
+        this.validateUsernameCharacters(userSignUpDTO.password);
+        
         if(format.test(userSignUpDTO.cityId)){
             throw new BadRequestException("CityId can't have special characters");
         }
@@ -98,6 +107,23 @@ export class UsersValidator {
             !userSignUpDTO.password ||
             !userSignUpDTO.username) {
             throw new BadRequestException("Request's values can't be null");
+        }
+    }
+
+    private validatePasswordCharacters(password: string) {
+        
+        var strongPasswordFormat = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
+        if(strongPasswordFormat.test(password)){
+            throw new BadRequestException("Passwords will contain at least 1 upper case letter,"
+            +" will contain at least 1 lower case letter and will contain at least 1 number or special character");
+        }
+    }
+    
+    private validateUsernameCharacters(username: string) {
+
+        var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+        if(format.test(username)){
+            throw new BadRequestException("Username can't have special characters");
         }
     }
 }
