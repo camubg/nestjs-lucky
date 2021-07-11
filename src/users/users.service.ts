@@ -16,7 +16,7 @@ import { AuthCredentialsDTO } from './dto/auth-credentials.dto';
 import { UserSignUpDTO } from './dto/user-sign-up.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './model/jwt-payload.interface';
+import { JwtPayload } from './jwt/jwt-payload.interface';
 import { UserProfile } from './model/user-profile.model';
 import { AddressProfile } from './model/address-profile.model';
 import { Profile } from 'src/repositories/entities/profile.entity';
