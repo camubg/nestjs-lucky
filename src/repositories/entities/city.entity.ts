@@ -1,15 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { Country } from "./country.entity";
 
 @Entity()
 export class City {
     
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     name: string;
 
-    @OneToOne(() => Country, { primary: true, cascade: true })
+    @ManyToOne(() => Country, {primary: false, eager: true})
     country: Country;
 }

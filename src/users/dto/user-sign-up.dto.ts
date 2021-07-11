@@ -4,6 +4,6 @@ export class UserSignUpDTO {
     password: string;
     name: string;
     address: string;
-    cityId: string;
+    cityId: number;
 
 }

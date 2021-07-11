@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Header, Param, UseGuards } from "@nestjs/common";
+import { Controller, Post, Body, Get, Header, Param, UseGuards, Logger } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "src/repositories/entities/user.entity";
 import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
@@ -10,6 +10,8 @@ import { UsersService } from "./users.service";
 @Controller('users')
 export class UsersController {
 
+    private logger = new Logger('UsersController');
+
     constructor(
         private readonly usersService: UsersService
         ) {}
@@ -19,27 +21,24 @@ export class UsersController {
         @Body() userSignUpDTO: UserSignUpDTO
         ): Promise<void> {
         
+            this.logger.log(`User ${userSignUpDTO.username} is trying to sign up`); 
             return this.usersService.addUser(userSignUpDTO);
     }
 
     @Post('login')
     loginUser(
         @Body() authCredentialsDTO: AuthCredentialsDTO): Promise<{ accessToken: string }> {
-        const generatedJwtToken = this.usersService.loginUser(authCredentialsDTO);
-        return generatedJwtToken;
+            this.logger.log(`User ${authCredentialsDTO.username} is trying to log in`); 
+            const generatedJwtToken = this.usersService.loginUser(authCredentialsDTO);
+            return generatedJwtToken;
     }
 
     @Get('profile')
     @UseGuards(AuthGuard())
     getProfileUser(@GetUser() user: User): Promise<Profile> {
-        return this.usersService.getProfileUser(user);
+            this.logger.log(`User ${user.username} retrieving profile`);
+            return this.usersService.getProfileUser(user);
     }
-
-    @Get()
-    handshake() {
-        return "hola";
-    }
-
 
 }
 
