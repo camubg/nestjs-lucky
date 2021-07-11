@@ -11,7 +11,7 @@ import { UserSignUpDTO } from "./dto/user-sign-up.dto";
 import { UsersValidator } from "./users-validator.service";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
-import { JwtPayload } from "./dto/jwt-payload.interface";
+import { JwtPayload } from "./model/jwt-payload.interface";
 import { UserProfile } from "./model/user-profile.model";
 import { AddressProfile } from "./model/address-profile.model";
 import { Profile } from "src/repositories/entities/profile.entity";
@@ -39,7 +39,7 @@ export class UsersService {
 
     async addUser(userSignUpDTO: UserSignUpDTO): Promise<void>{
         
-        this.usersValidator.validateUserSignUp(userSignUpDTO);
+        //this.usersValidator.validateUserSignUp(userSignUpDTO);
 
         if(await this.usersRepository.isUsernameUnique(userSignUpDTO.username) == false){
             this.logger.log(`${userSignUpDTO.username} is already taken`);
@@ -74,11 +74,6 @@ export class UsersService {
     }
 
     async getProfileUser(userFound: User):  Promise<UserProfile>  {
-
-        if (!userFound) {
-            this.logger.error("Unauthorized request");
-            throw new NotFoundException(`Profile not found`);
-        }
         
         const profile = await this.profilesRepository.findOne({ where: { user: userFound } });
 
