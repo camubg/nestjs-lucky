@@ -1,6 +1,6 @@
 import { BadRequestException, ConflictException } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
-import { User } from "./user.entity";
+import { User } from "./entities/user.entity";
 import * as bcrypt from 'bcrypt';
 
 @EntityRepository(User)

@@ -1,7 +1,7 @@
 import { EntityRepository, Repository } from "typeorm";
-import { Address } from "./address.entity";
-import { Profile } from "./profile.entity";
-import { User } from "./user.entity";
+import { Address } from "./entities/address.entity";
+import { Profile } from "./entities/profile.entity";
+import { User } from "./entities/user.entity";
 
 @EntityRepository(Profile)
 export class ProfilesRepository extends Repository<Profile> {
