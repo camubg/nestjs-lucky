@@ -7,8 +7,8 @@ import { CitiesRepository } from 'src/repositories/cities.repository';
 import { CountriesRepository } from 'src/repositories/countries.repository';
 import { ProfilesRepository } from 'src/repositories/profiles.repository';
 import { UsersRepository } from 'src/repositories/users.repository';
-import { JwtStrategy } from './jwt.strategy';
-import { UserExistsRule } from './user-exists.validator';
+import { JwtStrategy } from './jwt/jwt.strategy';
+import { UserExistsRule } from './validation/user-exists.validator';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 

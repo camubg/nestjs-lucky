@@ -5,7 +5,7 @@ import {
   Length,
   IsAlphanumeric,
 } from 'class-validator';
-import { UserExists } from '../user-exists.validator';
+import { UserExists } from '../validation/user-exists.validator';
 
 export class UserSignUpDTO {
   @IsNotEmpty()
