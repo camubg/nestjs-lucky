@@ -8,29 +8,29 @@ import { CountriesRepository } from 'src/repositories/countries.repository';
 import { ProfilesRepository } from 'src/repositories/profiles.repository';
 import { UsersRepository } from 'src/repositories/users.repository';
 import { JwtStrategy } from './jwt.strategy';
-import { UsersValidator } from './users-validator.service';
+import { UserExistsRule } from './user-exists.validator';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 @Module({
   imports: [
-    PassportModule.register({ defaultStrategy: 'jwt'}),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: 'privateSecret',
       signOptions: {
-        expiresIn: 3600
-      }
+        expiresIn: 3600,
+      },
     }),
     TypeOrmModule.forFeature([
       UsersRepository,
       AddressesRepository,
       CitiesRepository,
       ProfilesRepository,
-      CountriesRepository
-    ])
+      CountriesRepository,
+    ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersValidator, JwtStrategy],
-  exports: [JwtStrategy, PassportModule]
+  providers: [UsersService, JwtStrategy, UserExistsRule],
+  exports: [JwtStrategy, PassportModule],
 })
 export class UsersModule {}
