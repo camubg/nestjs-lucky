@@ -1,10 +1,10 @@
-import { Inject, Injectable, NotFoundException, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AddressesRepository } from "src/repositories/addresses.repository";
 import { CitiesRepository } from "src/repositories/cities.repository";
-import { City } from "src/repositories/city.entity";
+import { City } from "src/repositories/entities/city.entity";
 import { ProfilesRepository } from "src/repositories/profiles.repository";
-import { User } from "src/repositories/user.entity";
+import { User } from "src/repositories/entities/user.entity";
 import { UsersRepository } from "src/repositories/users.repository";
 import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
 import { UserSignUpDTO } from "./dto/user-sign-up.dto";
@@ -13,6 +13,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from "./dto/jwt-payload.interface";
 import { Profile } from "./model/profile.model";
+import { Address } from "./model/address.model";
 
 @Injectable()
 export class UsersService {
@@ -35,7 +36,7 @@ export class UsersService {
     async addUser(userSignUpDTO: UserSignUpDTO): Promise<void>{
         
         this.usersValidator.validateUserSignUp(userSignUpDTO);
-        
+    
         const newUser = await this.usersRepository.createUser(userSignUpDTO.username, userSignUpDTO.password);
         const city = await this.getCityById(userSignUpDTO.cityId);
         const newAddress = await this.addressesRepository.createAddress(userSignUpDTO.address, city);
@@ -43,9 +44,22 @@ export class UsersService {
     }
 
 
-    getUser():  Promise<{ profile: Profile }>  {
+    async getProfileUser(userFound: User):  Promise<Profile>  {
 
-        return null;
+        const profile = await this.profilesRepository.findOne({ where: { userFound } });
+
+        if(!profile){
+            //todo
+            throw new NotFoundException(`Profile not found`);
+        }
+
+        const addressToReturn = new Address(
+            profile.address.street, 
+            profile.address.city.name, 
+            profile.address.city.country.name
+            ); 
+       
+        return new Profile(profile.id, profile.name, addressToReturn);
     }
     
     async loginUser(authCredentialsDTO: AuthCredentialsDTO): Promise<{ accessToken: string }> {
@@ -64,24 +78,14 @@ export class UsersService {
         throw new UnauthorizedException(`Username or password is incorrect`);
     }
 
-    private async getUserById(id: string): Promise<User> {
-        
-        const found = await this.usersRepository.findOne(id);
-        if(!found){
-            throw new NotFoundException(`User with id "${id}" not found`);
-        }
-        return found;
-    }
-
     private async getCityById(id: string): Promise<City> {
         
-        const found = await this.citiesRepository.findOne(id);
+        const found = await this.citiesRepository.findOne({ id });
         if(!found){
             throw new NotFoundException(`City with id "${id}" not found`);
         }
         return found;
     }
-
 
 
 }

@@ -65,33 +65,33 @@ export class UsersValidator {
         this.validateUsernameLength(userSignUpDTO.username);
         this.validatePasswordLength(userSignUpDTO.password);
 
-        if(userSignUpDTO.name.length > 20){
-            throw new BadRequestException(`Name can't have more than "${maxLength}" characters`);
+        if(userSignUpDTO.name.length > 40){
+            throw new BadRequestException(`Name can't have more than "${40}" characters`);
         }
 
         if(userSignUpDTO.address.length < minLength ){
             throw new BadRequestException(`Address can't have less than "${minLength}" characters`);
-        } else if(userSignUpDTO.address.length > 20){
+        } else if(userSignUpDTO.address.length > 40){
             throw new BadRequestException(`Address can't have more than "${maxLength}" characters`);
         }
 
         if(userSignUpDTO.cityId.length == uuidLength ){
-            throw new BadRequestException(`CityId is invalid`);
+           // throw new BadRequestException(`CityId is invalid`);
         }
     }
 
     private userSignUpDTOIsString(userSignUpDTO: UserSignUpDTO) {
         
-        var format = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
-        var formatWithSpace = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+        var formatUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        var format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
         
         this.validatePasswordCharacters(userSignUpDTO.password);
         this.validateUsernameCharacters(userSignUpDTO.password);
         
-        if(format.test(userSignUpDTO.cityId)){
+        if(!formatUuid.test(userSignUpDTO.cityId)){
             throw new BadRequestException("CityId can't have special characters");
         }
-        if(formatWithSpace.test(userSignUpDTO.address)){
+        if(format.test(userSignUpDTO.address)){
             throw new BadRequestException("Address can't have special characters");
         }
         if(format.test(userSignUpDTO.name)){
@@ -113,7 +113,7 @@ export class UsersValidator {
     private validatePasswordCharacters(password: string) {
         
         var strongPasswordFormat = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
-        if(strongPasswordFormat.test(password)){
+        if(!strongPasswordFormat.test(password)){
             throw new BadRequestException("Passwords will contain at least 1 upper case letter,"
             +" will contain at least 1 lower case letter and will contain at least 1 number or special character");
         }
