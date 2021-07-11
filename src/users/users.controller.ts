@@ -4,7 +4,7 @@ import { User } from "src/repositories/entities/user.entity";
 import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
 import { UserSignUpDTO } from "./dto/user-sign-up.dto";
 import { GetUser } from "./get-user.decorator";
-import { Profile } from "./model/profile.model";
+import { UserProfile } from "./model/user-profile.model";
 import { UsersService } from "./users.service";
 
 @Controller('users')
@@ -35,7 +35,7 @@ export class UsersController {
 
     @Get('profile')
     @UseGuards(AuthGuard())
-    getProfileUser(@GetUser() user: User): Promise<Profile> {
+    getProfileUser(@GetUser() user: User): Promise<UserProfile> {
             this.logger.log(`User ${user.username} retrieving profile`);
             return this.usersService.getProfileUser(user);
     }

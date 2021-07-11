@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Logger } from "@nestjs/common";
+import { Logger } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
 import { User } from "./entities/user.entity";
 import * as bcrypt from 'bcrypt';
@@ -8,9 +8,7 @@ export class UsersRepository extends Repository<User> {
 
     private logger = new Logger('UsersRepository');
 
-    async createUser(username: string, password: string){
-
-        this.validateUsernameIsUnique(username);
+    async createUser(username: string, password: string): Promise<User>{
 
         const salt = await bcrypt.genSalt();
         const hashedPwd = await bcrypt.hash(password, salt);
@@ -25,14 +23,18 @@ export class UsersRepository extends Repository<User> {
         return newUser;
     }
 
-    private async validateUsernameIsUnique(username:string){
+    async isUsernameUnique(username:string): Promise<boolean> {
         const found = await this.createQueryBuilder("user")
         .select(['user.id', 'user.username', 'user.password']) 
         .where("user.username = :username", { username: username }).getOne();
         
+        return !found;
+    }
+
+    async deleteUser(newUser: User): Promise<void> {
+        const found = await this.findOne(newUser);
         if(found){
-            this.logger.log(`${username} is already taken`);
-            throw new ConflictException(`${username} is already taken`);
+            this.delete(found);
         }
     }
 

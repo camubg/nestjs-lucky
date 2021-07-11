@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ConflictException, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AddressesRepository } from "src/repositories/addresses.repository";
 import { CitiesRepository } from "src/repositories/cities.repository";
@@ -12,8 +12,10 @@ import { UsersValidator } from "./users-validator.service";
 import * as bcrypt from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from "./dto/jwt-payload.interface";
-import { Profile } from "./model/profile.model";
-import { Address } from "./model/address.model";
+import { UserProfile } from "./model/user-profile.model";
+import { AddressProfile } from "./model/address-profile.model";
+import { Profile } from "src/repositories/entities/profile.entity";
+import { Address } from "src/repositories/entities/address.entity";
 
 @Injectable()
 export class UsersService {
@@ -38,16 +40,26 @@ export class UsersService {
     async addUser(userSignUpDTO: UserSignUpDTO): Promise<void>{
         
         this.usersValidator.validateUserSignUp(userSignUpDTO);
+
+        if(await this.usersRepository.isUsernameUnique(userSignUpDTO.username) == false){
+            this.logger.log(`${userSignUpDTO.username} is already taken`);
+            throw new ConflictException(`${userSignUpDTO.username} is already taken`);
+        }
+
+        const city = await this.getCityById(userSignUpDTO.cityId);
+        
+        const newUser: User = null;
+        const newAddress: Address = null; 
+        const newProfile: Profile = null;
     
         try {
             const newUser = await this.usersRepository.createUser(userSignUpDTO.username, userSignUpDTO.password);
-            const city = await this.getCityById(userSignUpDTO.cityId);
             const newAddress = await this.addressesRepository.createAddress(userSignUpDTO.address, city);
-            this.profilesRepository.createProfile(userSignUpDTO.name, newUser, newAddress);
+            const newProfile = await this.profilesRepository.createProfile(userSignUpDTO.name, newUser, newAddress);
         } catch(err) {
-            if(err.name == "ConflictException"){
-                throw new BadRequestException("Username value is not available");
-            }
+
+            this.rollbackAnyChanges(newUser, newAddress, newProfile);
+
             this.logger.error(`Error creating new user: ${userSignUpDTO.username} with error message:` +
             `${err.message} - ${err.detail}`);
             throw new InternalServerErrorException("Something got wrong");
@@ -55,8 +67,13 @@ export class UsersService {
         
     }
 
+    private async rollbackAnyChanges(newUser: User, newAddress: Address, newProfile: Profile) {
+        await this.usersRepository.deleteUser(newUser);
+        await this.addressesRepository.deleteAddress(newAddress);
+        await this.profilesRepository.deleteProfile(newProfile);
+    }
 
-    async getProfileUser(userFound: User):  Promise<Profile>  {
+    async getProfileUser(userFound: User):  Promise<UserProfile>  {
 
         if (!userFound) {
             this.logger.error("Unauthorized request");
@@ -71,13 +88,13 @@ export class UsersService {
         }
 
         console.log(profile);
-        const addressToReturn = new Address(
+        const addressToReturn = new AddressProfile(
             profile.address.street, 
             profile.address.city.name, 
             profile.address.city.country.name
             ); 
        
-        return new Profile(profile.id, profile.name, addressToReturn);
+        return new UserProfile(profile.id, profile.name, addressToReturn);
     }
     
     async loginUser(authCredentialsDTO: AuthCredentialsDTO): Promise<{ accessToken: string }> {
