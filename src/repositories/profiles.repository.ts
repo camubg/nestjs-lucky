@@ -7,6 +7,7 @@ import { User } from "./entities/user.entity";
 export class ProfilesRepository extends Repository<Profile> {
 
     async createProfile(name: string, user: User, address: Address ){
+        
         const newProfile = this.create({
             name, 
             user,

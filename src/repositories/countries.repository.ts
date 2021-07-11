@@ -1,9 +1,11 @@
-import { NotFoundException } from "@nestjs/common";
+import { Logger, NotFoundException } from "@nestjs/common";
 import { EntityRepository, Repository } from "typeorm";
 import { Country } from "./entities/country.entity";
 
 @EntityRepository(Country)
 export class CountriesRepository extends Repository<Country> {
+
+    private logger = new Logger('CountriesRepository');
 
     constructor() {
         super();
@@ -25,6 +27,7 @@ export class CountriesRepository extends Repository<Country> {
         .where("country.name = :name", { name: name }).getOne();
         
         if(!found){
+            this.logger.error(`Country with name "${name}" not found`);
             throw new NotFoundException(`Country with name "${name}" not found`);
         }
         return found;

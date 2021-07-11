@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Inject, Injectable, InternalServerErrorException, Logger, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AddressesRepository } from "src/repositories/addresses.repository";
 import { CitiesRepository } from "src/repositories/cities.repository";
@@ -17,6 +17,8 @@ import { Address } from "./model/address.model";
 
 @Injectable()
 export class UsersService {
+
+    private logger = new Logger('UsersService');
 
     constructor(
         @InjectRepository(UsersRepository)
@@ -37,22 +39,38 @@ export class UsersService {
         
         this.usersValidator.validateUserSignUp(userSignUpDTO);
     
-        const newUser = await this.usersRepository.createUser(userSignUpDTO.username, userSignUpDTO.password);
-        const city = await this.getCityById(userSignUpDTO.cityId);
-        const newAddress = await this.addressesRepository.createAddress(userSignUpDTO.address, city);
-        this.profilesRepository.createProfile(userSignUpDTO.name, newUser, newAddress);
+        try {
+            const newUser = await this.usersRepository.createUser(userSignUpDTO.username, userSignUpDTO.password);
+            const city = await this.getCityById(userSignUpDTO.cityId);
+            const newAddress = await this.addressesRepository.createAddress(userSignUpDTO.address, city);
+            this.profilesRepository.createProfile(userSignUpDTO.name, newUser, newAddress);
+        } catch(err) {
+            if(err.name == "ConflictException"){
+                throw new BadRequestException("Username value is not available");
+            }
+            this.logger.error(`Error creating new user: ${userSignUpDTO.username} with error message:` +
+            `${err.message} - ${err.detail}`);
+            throw new InternalServerErrorException("Something got wrong");
+        }
+        
     }
 
 
     async getProfileUser(userFound: User):  Promise<Profile>  {
 
-        const profile = await this.profilesRepository.findOne({ where: { userFound } });
+        if (!userFound) {
+            this.logger.error("Unauthorized request");
+            throw new NotFoundException(`Profile not found`);
+        }
+        
+        const profile = await this.profilesRepository.findOne({ where: { user: userFound } });
 
         if(!profile){
-            //todo
+            this.logger.error(`Profile for user: ${userFound.username} not found`)
             throw new NotFoundException(`Profile not found`);
         }
 
+        console.log(profile);
         const addressToReturn = new Address(
             profile.address.street, 
             profile.address.city.name, 
@@ -78,7 +96,7 @@ export class UsersService {
         throw new UnauthorizedException(`Username or password is incorrect`);
     }
 
-    private async getCityById(id: string): Promise<City> {
+    private async getCityById(id: number): Promise<City> {
         
         const found = await this.citiesRepository.findOne({ id });
         if(!found){
@@ -86,6 +104,5 @@ export class UsersService {
         }
         return found;
     }
-
 
 }

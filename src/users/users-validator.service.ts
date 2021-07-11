@@ -1,5 +1,4 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { min } from "rxjs";
 import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
 import { UserSignUpDTO } from "./dto/user-sign-up.dto";
 
@@ -74,23 +73,15 @@ export class UsersValidator {
         } else if(userSignUpDTO.address.length > 40){
             throw new BadRequestException(`Address can't have more than "${maxLength}" characters`);
         }
-
-        if(userSignUpDTO.cityId.length == uuidLength ){
-           // throw new BadRequestException(`CityId is invalid`);
-        }
     }
 
     private userSignUpDTOIsString(userSignUpDTO: UserSignUpDTO) {
-        
-        var formatUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
         var format = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
         
         this.validatePasswordCharacters(userSignUpDTO.password);
         this.validateUsernameCharacters(userSignUpDTO.password);
         
-        if(!formatUuid.test(userSignUpDTO.cityId)){
-            throw new BadRequestException("CityId can't have special characters");
-        }
         if(format.test(userSignUpDTO.address)){
             throw new BadRequestException("Address can't have special characters");
         }
