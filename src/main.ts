@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { useContainer } from 'typeorm';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -7,6 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const port = 3000;
   await app.listen(port);
+  
   logger.log(`Application listening on port ${port}`)
 }
 bootstrap();

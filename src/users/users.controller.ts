@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Header, Param, UseGuards, Logger } from "@nestjs/common";
+import { Controller, Post, Body, Get, Header, Param, UseGuards, Logger, UsePipes } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport";
 import { User } from "src/repositories/entities/user.entity";
 import { AuthCredentialsDTO } from "./dto/auth-credentials.dto";
@@ -6,6 +6,7 @@ import { UserSignUpDTO } from "./dto/user-sign-up.dto";
 import { GetUser } from "./get-user.decorator";
 import { UserProfile } from "./model/user-profile.model";
 import { UsersService } from "./users.service";
+import { CustomValidationPipe } from "./validation.pipe";
 
 @Controller('users')
 export class UsersController {
@@ -17,6 +18,7 @@ export class UsersController {
         ) {}
 
     @Post()
+    @UsePipes(new CustomValidationPipe())
     addUser(
         @Body() userSignUpDTO: UserSignUpDTO
         ): Promise<void> {
@@ -26,6 +28,7 @@ export class UsersController {
     }
 
     @Post('login')
+    @UsePipes(new CustomValidationPipe())
     loginUser(
         @Body() authCredentialsDTO: AuthCredentialsDTO): Promise<{ accessToken: string }> {
             this.logger.log(`User ${authCredentialsDTO.username} is trying to log in`); 
