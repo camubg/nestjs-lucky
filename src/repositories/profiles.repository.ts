@@ -25,4 +25,10 @@ export class ProfilesRepository extends Repository<Profile> {
         }
     }
 
+    async getProfileByUser(userFound: User): Promise<Profile> {
+        return await this.findOne({
+            where: { user: userFound },
+          });
+    }
+
 }
