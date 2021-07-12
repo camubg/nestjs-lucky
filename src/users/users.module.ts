@@ -11,15 +11,22 @@ import { JwtStrategy } from './jwt/jwt.strategy';
 import { UserExistsRule } from './validation/user-exists.validator';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { async } from 'rxjs';
 
 @Module({
   imports: [
+    ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: 'privateSecret',
-      signOptions: {
-        expiresIn: 3600,
-      },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: {
+          expiresIn: 3600,
+        },
+      }),
     }),
     TypeOrmModule.forFeature([
       UsersRepository,
