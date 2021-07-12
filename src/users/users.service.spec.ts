@@ -8,10 +8,11 @@ import { UsersRepository } from '../repositories/users.repository';
 import { AddressProfile } from './model/address-profile.model';
 import { UserProfile } from './model/user-profile.model';
 import { UsersService } from './users.service';
+import * as bcrypt from 'bcrypt';
 
 const mockUsersRepository = () => ({
   createUser: jest.fn(),
-  findOne: jest.fn()
+  findOne: jest.fn(),
 });
 
 const mockAddressesRepository = () => ({
@@ -28,13 +29,13 @@ const mockProfilesRepository = () => ({
 });
 
 const mockJwtService = () => ({
-    sign:jest.fn(),
+  sign: jest.fn(),
 });
 
 const mockAuthCredentialsDTO = {
-    username: 'lucky',
-    password: 'secret'
-}
+  username: 'lucky',
+  password: 'secret',
+};
 
 const mockUserSignUpDTO = {
   username: 'lucky',
@@ -151,15 +152,16 @@ describe('UsersService', () => {
     });
 
     it('user logs in with credentials', async () => {
-        // to do: resolve bcrypt.compare mocking
-        // const accessToken = "token";
-        // usersRepository.findOne.mockResolvedValue(mockUser);
-        // jwtService.sign.mockResolvedValue(accessToken);
-  
-        // const result = await usersService.loginUser(mockAuthCredentialsDTO);
-        // expect(result).toEqual({ accessToken });
-      });
+      const accessToken = 'token';
+      const salt = await bcrypt.genSalt();
+      const hashedPwd = await bcrypt.hash(mockUser.password, salt);
+      mockUser.password = hashedPwd;
 
+      usersRepository.findOne.mockResolvedValue(mockUser);
+      jwtService.sign.mockResolvedValue(accessToken);
+
+      const result = await usersService.loginUser(mockAuthCredentialsDTO);
+      expect(result).toEqual({ accessToken });
+    });
   });
 });
- 
