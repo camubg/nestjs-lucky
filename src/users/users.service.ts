@@ -21,6 +21,7 @@ import { UserProfile } from './model/user-profile.model';
 import { AddressProfile } from './model/address-profile.model';
 import { Profile } from '../repositories/entities/profile.entity';
 import { Address } from '../repositories/entities/address.entity';
+import { CacheService } from './cache.service';
 
 @Injectable()
 export class UsersService {
@@ -36,6 +37,7 @@ export class UsersService {
     @InjectRepository(ProfilesRepository)
     private profilesRepository: ProfilesRepository,
     private jwtService: JwtService,
+    private cacheService: CacheService,
   ) {}
 
   async addUser(userSignUpDTO: UserSignUpDTO): Promise<void> {
@@ -81,10 +83,15 @@ export class UsersService {
   }
 
   async getProfileUser(userFound: User): Promise<UserProfile> {
-    const profile = await this.profilesRepository.getProfileByUser(userFound);
+    let profile = await this.cacheService.getUserProfile(userFound.id);
+
     if (!profile) {
-      this.logger.error(`Profile for user: ${userFound.username} not found`);
-      throw new NotFoundException(`Profile not found`);
+      profile = await this.profilesRepository.getProfileByUser(userFound);
+      if (!profile) {
+        this.logger.error(`Profile for user: ${userFound.username} not found`);
+        throw new NotFoundException(`Profile not found`);
+      }
+      this.cacheService.saveUserProfile(userFound.id, profile);
     }
 
     const addressToReturn = new AddressProfile(

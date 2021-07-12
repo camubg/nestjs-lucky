@@ -66,22 +66,32 @@ $ npm install
 
 ## Running the app
 
-```bash
+Please follow the next steps in this order:
 
+```bash
 # start db
 $ make db_start
+
+# start redis cache
+$ make redis_start
 
 # development
 $ npm run start
 
 # seed db
-$ make db_start
+$ make db_seed
+```
 
+Other useful commands:
+```bash
 # watch mode
 $ npm run start:dev
 
 # stop db
 $ make db_stop
+
+# stop redis cache
+$ make redis_stop
 ```
 
 ## Test

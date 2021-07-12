@@ -6,3 +6,9 @@ db_stop:
 
 db_seed:
 	cat ./Docker/db/seed.sql | docker exec -i postgres-nest psql -U postgres -d lucky-db
+
+redis_start:
+	docker run --name rediscontainer -p 5003:6379 -d redis
+
+redis_stop:
+	docker container stop rediscontainer && docker rm rediscontainer

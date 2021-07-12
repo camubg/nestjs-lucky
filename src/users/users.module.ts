@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,10 +12,20 @@ import { UserExistsRule } from './validation/user-exists.validator';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { async } from 'rxjs';
+import * as redisStore from 'cache-manager-redis-store';
+import { CacheService } from './cache.service';
 
 @Module({
   imports: [
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        store: redisStore,
+        host: configService.get('REDIS_HOST'),
+        port: configService.get('REDIS_PORT'),
+      }),
+    }),
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -37,7 +47,7 @@ import { async } from 'rxjs';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, JwtStrategy, UserExistsRule],
+  providers: [UsersService, JwtStrategy, UserExistsRule, CacheService],
   exports: [JwtStrategy, PassportModule],
 })
 export class UsersModule {}
