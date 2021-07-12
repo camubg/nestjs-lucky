@@ -1,5 +1,5 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { UsersRepository } from 'src/repositories/users.repository';
+import { UsersRepository } from '../../repositories/users.repository';
 import {
   ValidatorConstraintInterface,
   ValidatorConstraint,

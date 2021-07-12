@@ -15,4 +15,8 @@ export class CitiesRepository extends Repository<City> {
         return newCity;
     }
 
+    async getCityById(id: number): Promise<City> {
+        return await this.findOne({ id });
+    }
+
 }

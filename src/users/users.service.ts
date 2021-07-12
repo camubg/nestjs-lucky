@@ -6,12 +6,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AddressesRepository } from 'src/repositories/addresses.repository';
-import { CitiesRepository } from 'src/repositories/cities.repository';
-import { City } from 'src/repositories/entities/city.entity';
-import { ProfilesRepository } from 'src/repositories/profiles.repository';
-import { User } from 'src/repositories/entities/user.entity';
-import { UsersRepository } from 'src/repositories/users.repository';
+import { AddressesRepository } from '../repositories/addresses.repository';
+import { CitiesRepository } from '../repositories/cities.repository';
+import { City } from '../repositories/entities/city.entity';
+import { ProfilesRepository } from '../repositories/profiles.repository';
+import { User } from '../repositories/entities/user.entity';
+import { UsersRepository } from '../repositories/users.repository';
 import { AuthCredentialsDTO } from './dto/auth-credentials.dto';
 import { UserSignUpDTO } from './dto/user-sign-up.dto';
 import * as bcrypt from 'bcrypt';
@@ -19,8 +19,8 @@ import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt/jwt-payload.interface';
 import { UserProfile } from './model/user-profile.model';
 import { AddressProfile } from './model/address-profile.model';
-import { Profile } from 'src/repositories/entities/profile.entity';
-import { Address } from 'src/repositories/entities/address.entity';
+import { Profile } from '../repositories/entities/profile.entity';
+import { Address } from '../repositories/entities/address.entity';
 
 @Injectable()
 export class UsersService {
@@ -81,10 +81,7 @@ export class UsersService {
   }
 
   async getProfileUser(userFound: User): Promise<UserProfile> {
-    const profile = await this.profilesRepository.findOne({
-      where: { user: userFound },
-    });
-
+    const profile = await this.profilesRepository.getProfileByUser(userFound);
     if (!profile) {
       this.logger.error(`Profile for user: ${userFound.username} not found`);
       throw new NotFoundException(`Profile not found`);
@@ -116,7 +113,7 @@ export class UsersService {
   }
 
   private async getCityById(id: number): Promise<City> {
-    const found = await this.citiesRepository.findOne({ id });
+    const found = await this.citiesRepository.getCityById(id);
     if (!found) {
       throw new NotFoundException(`City with id "${id}" not found`);
     }
