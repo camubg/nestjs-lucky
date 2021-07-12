@@ -18,15 +18,7 @@ export class UserExistsRule implements ValidatorConstraintInterface {
   ) {}
 
   async validate(value: string) {
-    try {
-      if ((await this.usersRepository.isUsernameUnique(value)) == false) {
-        throw new ConflictException();
-      }
-    } catch (e) {
-      return false;
-    }
-
-    return true;
+    return await this.usersRepository.isUsernameUnique(value);
   }
 
   defaultMessage(args: ValidationArguments) {

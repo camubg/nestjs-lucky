@@ -1,7 +1,7 @@
 import { CACHE_MANAGER, Inject, Injectable, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
-import { Profile } from 'src/repositories/entities/profile.entity';
+import { UserProfile } from './model/user-profile.model';
 
 @Injectable()
 export class CacheService {
@@ -11,8 +11,8 @@ export class CacheService {
     private configService: ConfigService,
   ) {}
 
-  async getUserProfile(userId: number): Promise<Profile> {
-    var value = await this.cacheManager.get<Profile>(userId.toString());
+  async getUserProfile(userId: number): Promise<UserProfile> {
+    var value = await this.cacheManager.get<UserProfile>(userId.toString());
     if (value) {
       return {
         data: value,
@@ -21,8 +21,11 @@ export class CacheService {
     }
   }
 
-  async saveUserProfile(userId: number, profile: Profile): Promise<void> {
-    await this.cacheManager.set<Profile>(userId.toString(), profile, {
+  async saveUserProfile(
+    userId: number,
+    userProfile: UserProfile,
+  ): Promise<void> {
+    await this.cacheManager.set<UserProfile>(userId.toString(), userProfile, {
       ttl: this.configService.get('REDIS_TTL'),
     });
   }

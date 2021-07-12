@@ -83,17 +83,22 @@ export class UsersService {
   }
 
   async getProfileUser(userFound: User): Promise<UserProfile> {
-    let profile = await this.cacheService.getUserProfile(userFound.id);
+    let userProfile = await this.cacheService.getUserProfile(userFound.id);
 
-    if (!profile) {
-      profile = await this.profilesRepository.getProfileByUser(userFound);
+    if (!userProfile) {
+      const profile = await this.profilesRepository.getProfileByUser(userFound);
       if (!profile) {
         this.logger.error(`Profile for user: ${userFound.username} not found`);
         throw new NotFoundException(`Profile not found`);
       }
-      this.cacheService.saveUserProfile(userFound.id, profile);
+      userProfile = this.createProfileUser(profile);
+      this.cacheService.saveUserProfile(userFound.id, userProfile);
     }
 
+    return userProfile;
+  }
+
+  private createProfileUser(profile: Profile): UserProfile {
     const addressToReturn = new AddressProfile(
       profile.address.street,
       profile.address.city.name,
