@@ -48,7 +48,13 @@ import { CityExistsRule } from './validation/city-exists.validator';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService, JwtStrategy, UserUniqueRule, CityExistsRule, CacheService],
+  providers: [
+    UsersService,
+    JwtStrategy,
+    UserUniqueRule,
+    CityExistsRule,
+    CacheService,
+  ],
   exports: [JwtStrategy, PassportModule],
 })
 export class UsersModule {}

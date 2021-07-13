@@ -1,9 +1,9 @@
-import { AddressProfile } from "./address-profile.model";
+import { AddressProfile } from './address-profile.model';
 
 export class UserProfile {
-    constructor(
-        public id: number, 
-        public name: string, 
-        public address: AddressProfile
-        ) {}
+  constructor(
+    public id: number,
+    public name: string,
+    public address: AddressProfile,
+  ) {}
 }

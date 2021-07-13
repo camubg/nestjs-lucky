@@ -67,7 +67,9 @@ export class UsersService {
         `Error creating new user: ${userSignUpDTO.username} with error message:` +
           `${err.message} - ${err.detail}`,
       );
-      throw new InternalServerErrorException('Something got wrong, please contact support');
+      throw new InternalServerErrorException(
+        'Something got wrong, please contact support',
+      );
     }
   }
 
@@ -114,12 +116,16 @@ export class UsersService {
 
     const user = await this.usersRepository.findOne({ username });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user && await this.passwordsMatch(password, user.password)) {
       const payload: JwtPayload = { username };
       const accessToken: string = await this.jwtService.sign(payload);
       return { accessToken };
     }
 
     throw new UnauthorizedException(`Username or password is incorrect`);
+  }
+
+  private async passwordsMatch(inputPassword: string, storePassword: string) {
+    return await bcrypt.compare(inputPassword, storePassword);
   }
 }

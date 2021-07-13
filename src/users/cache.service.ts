@@ -16,7 +16,7 @@ export class CacheService {
     if (value) {
       return {
         data: value,
-        LoadsFrom: 'redis cache',
+        LoadsFrom: 'redisCache',
       }.data;
     }
   }
