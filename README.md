@@ -129,7 +129,7 @@ FROM city
 WHERE id = 1
 ```
 
-Get userProfile 
+Get userProfile by userId
 ```SQL
 SELECT 
 	profile.id, 
