@@ -54,14 +54,14 @@ const mockUserSignUpDTO = {
 const mockAddressProfile = {
   street: 'Av Siempreviva 123',
   city: 'Buenos Aires',
-  country: 'Argentina'
-}
+  country: 'Argentina',
+};
 
 const mockUserProfile = {
   id: 5,
   name: 'lucky name',
-  address: mockAddressProfile
-}
+  address: mockAddressProfile,
+};
 
 const mockUser = {
   id: 1,

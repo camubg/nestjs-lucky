@@ -8,7 +8,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { AddressesRepository } from '../repositories/addresses.repository';
 import { CitiesRepository } from '../repositories/cities.repository';
-import { City } from '../repositories/entities/city.entity';
 import { ProfilesRepository } from '../repositories/profiles.repository';
 import { User } from '../repositories/entities/user.entity';
 import { UsersRepository } from '../repositories/users.repository';
@@ -68,7 +67,7 @@ export class UsersService {
         `Error creating new user: ${userSignUpDTO.username} with error message:` +
           `${err.message} - ${err.detail}`,
       );
-      throw new InternalServerErrorException('Something got wrong');
+      throw new InternalServerErrorException('Something got wrong, please contact support');
     }
   }
 
@@ -123,5 +122,4 @@ export class UsersService {
 
     throw new UnauthorizedException(`Username or password is incorrect`);
   }
-
 }

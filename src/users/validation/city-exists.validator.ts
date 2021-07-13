@@ -19,7 +19,7 @@ export class CityExistsRule implements ValidatorConstraintInterface {
 
   async validate(value: number) {
     const found = await this.citiesRepository.getCityById(value);
-    return !(!found);
+    return !!found;
   }
 
   defaultMessage(args: ValidationArguments) {
