@@ -66,7 +66,7 @@ $ npm install
 
 ## Running the app
 
-Please follow the next steps in this order:
+Please after installation, follow the next steps in this order:
 
 ```bash
 # start db
@@ -105,4 +105,51 @@ $ npm run test:e2e
 
 # test coverage
 $ npm run test:cov
+```
+
+## Decisions 
+
+- Not all endpoints follow REST conventions, but I think this is a good approach as our consumer is another app and also we don't want to expose any other information about our users.
+
+- I decided to use an ORM as I priorized other tasks in the time I had. But see Queries section to see some of the queries I would have to use if I wouldn't have an ORM.
+
+## Queries
+
+Get country by name
+```bash
+SELECT id, name 
+FROM country
+WHERE name = 'someName'
+```
+
+Get city by id
+```bash
+SELECT id, name 
+FROM city
+WHERE id = 1
+```
+
+Get userProfile 
+```bash
+SELECT 
+	profile.id, 
+	profile.name as profile_name,
+	address.street,
+	city.name as city_name,
+	country.name as contry_name
+FROM profile
+INNER JOIN address ON profile."addressId" = address.id
+INNER JOIN city ON address."cityId" = city.id
+INNER JOIN country ON city."countryId" = country.id
+WHERE profile."userId" = 7
+```
+
+Get user by username 
+```bash
+SELECT
+	id,
+	username,
+	"password"
+FROM "user"
+WHERE username = 'kala'
 ```
