@@ -29,7 +29,7 @@
 
 ![Diagrama en blanco](https://user-images.githubusercontent.com/11724728/125210603-431ea700-e277-11eb-9882-5711c86d02ed.png)
 
-Every column in every table must be not null.
+Every column in every table is required.
 
 ## Endpoints 
 
@@ -116,21 +116,21 @@ $ npm run test:cov
 ## Queries
 
 Get country by name
-```bash
+```SQL
 SELECT id, name 
 FROM country
 WHERE name = 'someName'
 ```
 
 Get city by id
-```bash
+```SQL
 SELECT id, name 
 FROM city
 WHERE id = 1
 ```
 
 Get userProfile 
-```bash
+```SQL
 SELECT 
 	profile.id, 
 	profile.name as profile_name,
@@ -145,7 +145,7 @@ WHERE profile."userId" = 7
 ```
 
 Get user by username 
-```bash
+```SQL
 SELECT
 	id,
 	username,
