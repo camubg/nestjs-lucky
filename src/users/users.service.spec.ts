@@ -9,6 +9,7 @@ import { AddressProfile } from './model/address-profile.model';
 import { UserProfile } from './model/user-profile.model';
 import { UsersService } from './users.service';
 import * as bcrypt from 'bcrypt';
+import { CacheService } from './cache.service';
 
 const mockUsersRepository = () => ({
   createUser: jest.fn(),
@@ -32,6 +33,11 @@ const mockJwtService = () => ({
   sign: jest.fn(),
 });
 
+const mockCacheService = () => ({
+  getUserProfile: jest.fn(),
+  saveUserProfile: jest.fn(),
+});
+
 const mockAuthCredentialsDTO = {
   username: 'lucky',
   password: 'secret',
@@ -44,6 +50,18 @@ const mockUserSignUpDTO = {
   address: 'Av Siempreviva 123',
   cityId: 3,
 };
+
+const mockAddressProfile = {
+  street: 'Av Siempreviva 123',
+  city: 'Buenos Aires',
+  country: 'Argentina'
+}
+
+const mockUserProfile = {
+  id: 5,
+  name: 'lucky name',
+  address: mockAddressProfile
+}
 
 const mockUser = {
   id: 1,
@@ -82,6 +100,7 @@ describe('UsersService', () => {
   let citiesRepository;
   let profilesRepository;
   let jwtService;
+  let cacheService;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -92,6 +111,7 @@ describe('UsersService', () => {
         { provide: CitiesRepository, useFactory: mockCitiesRepository },
         { provide: ProfilesRepository, useFactory: mockProfilesRepository },
         { provide: JwtService, useFactory: mockJwtService },
+        { provide: CacheService, useFactory: mockCacheService },
       ],
     }).compile();
 
@@ -101,10 +121,24 @@ describe('UsersService', () => {
     citiesRepository = module.get(CitiesRepository);
     profilesRepository = module.get(ProfilesRepository);
     jwtService = module.get(JwtService);
+    cacheService = module.get(CacheService);
   });
 
   describe('getProfileUser', () => {
+    it('calls CacheService.getUserProfile and creates and return a UserProfile', async () => {
+      cacheService.getUserProfile.mockResolvedValue(mockUserProfile);
+      const result = await usersService.getProfileUser(mockUser);
+      const addressExpected = new AddressProfile(
+        'Av Siempreviva 123',
+        'Buenos Aires',
+        'Argentina',
+      );
+      const profileExpected = new UserProfile(5, 'lucky name', addressExpected);
+      expect(result).toEqual(profileExpected);
+    });
+
     it('calls ProfilesRepository.getProfileByUser and creates and return a UserProfile', async () => {
+      cacheService.getUserProfile.mockResolvedValue(null);
       profilesRepository.getProfileByUser.mockResolvedValue(mockProfile);
       const result = await usersService.getProfileUser(mockUser);
       const addressExpected = new AddressProfile(
@@ -117,6 +151,7 @@ describe('UsersService', () => {
     });
 
     it('calls ProfilesRepository.getProfileByUser and handles an error', async () => {
+      cacheService.getUserProfile.mockResolvedValue(null);
       profilesRepository.getProfileByUser.mockResolvedValue(null);
       expect(usersService.getProfileUser(mockUser)).rejects.toThrow(
         NotFoundException,
@@ -125,13 +160,6 @@ describe('UsersService', () => {
   });
 
   describe('addUser', () => {
-    it('cityId is invalid and fails', async () => {
-      citiesRepository.getCityById.mockResolvedValue(null);
-      expect(usersService.addUser(mockUserSignUpDTO)).rejects.toThrow(
-        NotFoundException,
-      );
-    });
-
     it('creates and saves in the db a new user', async () => {
       citiesRepository.getCityById.mockResolvedValue(mockCity);
 
