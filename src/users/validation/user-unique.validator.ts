@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../../repositories/users.repository';
 import {
   ValidatorConstraintInterface,
@@ -9,9 +9,9 @@ import {
 } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 
-@ValidatorConstraint({ name: 'UserExists', async: true })
+@ValidatorConstraint({ name: 'UserUnique', async: true })
 @Injectable()
-export class UserExistsRule implements ValidatorConstraintInterface {
+export class UserUniqueRule implements ValidatorConstraintInterface {
   constructor(
     @InjectRepository(UsersRepository)
     private usersRepository: UsersRepository,
@@ -26,14 +26,14 @@ export class UserExistsRule implements ValidatorConstraintInterface {
   }
 }
 
-export function UserExists(validationOptions?: ValidationOptions) {
+export function UserUnique(validationOptions?: ValidationOptions) {
   return function (object: any, propertyName: string) {
     registerDecorator({
-      name: 'UserExists',
+      name: 'UserUnique',
       target: object.constructor,
       propertyName: propertyName,
       options: validationOptions,
-      validator: UserExistsRule,
+      validator: UserUniqueRule,
     });
   };
 }

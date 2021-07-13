@@ -41,7 +41,7 @@ export class UsersService {
   ) {}
 
   async addUser(userSignUpDTO: UserSignUpDTO): Promise<void> {
-    const city = await this.getCityById(userSignUpDTO.cityId);
+    const city = await this.citiesRepository.getCityById(userSignUpDTO.cityId);
 
     const newUser: User = null;
     const newAddress: Address = null;
@@ -124,11 +124,4 @@ export class UsersService {
     throw new UnauthorizedException(`Username or password is incorrect`);
   }
 
-  private async getCityById(id: number): Promise<City> {
-    const found = await this.citiesRepository.getCityById(id);
-    if (!found) {
-      throw new NotFoundException(`City with id "${id}" not found`);
-    }
-    return found;
-  }
 }

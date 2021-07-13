@@ -5,14 +5,15 @@ import {
   Length,
   IsAlphanumeric,
 } from 'class-validator';
-import { UserExists } from '../validation/user-exists.validator';
+import { CityExists } from '../validation/city-exists.validator';
+import { UserUnique } from '../validation/user-unique.validator';
 
 export class UserSignUpDTO {
   @IsNotEmpty()
   @Length(4, 20)
   @IsString()
-  @UserExists()
   @IsAlphanumeric()
+  @UserUnique()
   username: string;
 
   @IsNotEmpty()
@@ -32,5 +33,6 @@ export class UserSignUpDTO {
   @IsNotEmpty()
   @IsNumberString()
   @Length(1, 100)
+  @CityExists()
   cityId: number;
 }
