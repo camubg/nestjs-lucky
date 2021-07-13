@@ -107,7 +107,7 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## Decisions 
+## Decisions made
 
 - Not all endpoints follow REST conventions, but I think this is a good approach as our consumer is another app and also we don't want to expose any other information about our users.
 
